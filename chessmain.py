@@ -44,33 +44,27 @@ class MainWindow(QWidget):
             y_offset =  30
             file = ((local_pos.x() + x_offset) // square_size)
             rank =  7 - ((local_pos.y() + y_offset) // square_size)
-            piece = self.chessboard.piece_at(rank *  8 + file)
+            square = rank *  8 + file
+            piece = self.chessboard.piece_at(square)
             if piece:
-                # Piece selected, store it along with the square
                 self.selected_piece = piece
-                self.selected_square = rank *  8 + file
-                # Highlight possible moves
+                self.selected_square = square
+                legal_moves = [move for move in self.chessboard.legal_moves if move.from_square == square]
                 self.update_board(move_squares=[move.to_square for move in legal_moves])
             elif self.selected_piece:
-                # Check if the clicked square is a valid move destination
-                move = chess.Move(self.selected_square, rank *  8 + file)
+                move = chess.Move(self.selected_square, square)
                 if move in self.chessboard.legal_moves:
-                    # Perform the move and update the board
                     self.chessboard.push(move)
                     self.print_fen()
                     self.update_board()
-                    # Reset selected piece
                     self.selected_piece = None
                     self.selected_square = None
                 else:
-                    # Invalid move, clear highlights
                     self.update_board()
                     self.selected_piece = None
                     self.selected_square = None
             else:
-                # No piece selected and no piece clicked, clear highlights
                 self.update_board()
-
 if __name__ == "__main__":
     app = QApplication([])
     window = MainWindow()
