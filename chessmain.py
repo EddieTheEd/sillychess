@@ -21,12 +21,11 @@ class MainWindow(QWidget):
         fen = self.chessboard.fen()
         print(f"Current FEN: {fen}")
 
-
     def update_board(self, move_squares=None):
         fill_map = {}
         if move_squares:
             for square in move_squares:
-                fill_map[square] = '#ff0000'  # Red color for highlighting
+                fill_map[square] = '#ff0000'
         self.chessboardSvg = chess.svg.board(
             self.chessboard,
             fill=fill_map,
@@ -34,7 +33,6 @@ class MainWindow(QWidget):
         ).encode("UTF-8")
         self.widgetSvg.load(self.chessboardSvg)
 
-# Modify the mousePressEvent method to pass the squares of possible moves
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             square_size =  1080 //  8
