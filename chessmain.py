@@ -17,6 +17,9 @@ class MainWindow(QWidget):
         self.chessboard = chess.Board()
         self.update_board()
 
+        self.selected_piece = None
+        self.selected_square = None
+
     def print_fen(self):
         fen = self.chessboard.fen()
         print(f"Current FEN: {fen}")
@@ -43,16 +46,30 @@ class MainWindow(QWidget):
             rank =  7 - ((local_pos.y() + y_offset) // square_size)
             piece = self.chessboard.piece_at(rank *  8 + file)
             if piece:
-                algebraic_notation = chess.square_name(rank *  8 + file)
-                legal_moves = [move for move in self.chessboard.legal_moves if move.from_square == rank *  8 + file]
-                print(f"Possible moves for {algebraic_notation}: {', '.join(str(move) for move in legal_moves)}")
-                # Highlight the squares of the possible moves
+                # Piece selected, store it along with the square
+                self.selected_piece = piece
+                self.selected_square = rank *  8 + file
+                # Highlight possible moves
                 self.update_board(move_squares=[move.to_square for move in legal_moves])
+            elif self.selected_piece:
+                # Check if the clicked square is a valid move destination
+                move = chess.Move(self.selected_square, rank *  8 + file)
+                if move in self.chessboard.legal_moves:
+                    # Perform the move and update the board
+                    self.chessboard.push(move)
+                    self.print_fen()
+                    self.update_board()
+                    # Reset selected piece
+                    self.selected_piece = None
+                    self.selected_square = None
+                else:
+                    # Invalid move, clear highlights
+                    self.update_board()
+                    self.selected_piece = None
+                    self.selected_square = None
             else:
-                print("No piece found at the clicked position.")
-                # Clear the highlighted squares
+                # No piece selected and no piece clicked, clear highlights
                 self.update_board()
-
 
 if __name__ == "__main__":
     app = QApplication([])
