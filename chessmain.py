@@ -13,6 +13,8 @@ class MainWindow(QWidget):
         self.widgetSvg = QSvgWidget(parent=self)
         self.widgetSvg.setGeometry(10,   10,   1080,   1080)
         layout.addWidget(self.widgetSvg)
+
+        self.setWindowFlags(Qt.Window)
         
         self.chessboard = chess.Board()
         self.update_board()
@@ -61,9 +63,13 @@ class MainWindow(QWidget):
             square = rank *  8 + file
             if self.selected_piece:
                 move = chess.Move(self.selected_square, square)
+                if self.chessboard.piece_at(self.selected_square).piece_type == chess.PAWN and \
+                   ((self.chessboard.turn == chess.WHITE and rank ==  7) or \
+                    (self.chessboard.turn == chess.BLACK and rank ==  0)):
+                    move.promotion = chess.QUEEN  # Promote to queen
                 if move in self.chessboard.legal_moves:
                     self.chessboard.push(move)
-                    self.print_fen()
+                    #self.print_fen()
                     window.outcome_check()
                     self.update_board()
                     self.selected_piece = None
@@ -82,13 +88,4 @@ if __name__ == "__main__":
     app = QApplication([])
     window = MainWindow()
     window.show()
-    while True:
-        nextmove = input("Next move:\n")
-        try:
-            window.chessboard.push_san(nextmove)
-            window.print_fen()  # Call the FEN printing function here
-            window.update_board()
-            window.outcome_check()
-        except ValueError:
-            print("Incorrect move.")
     app.exec_()
