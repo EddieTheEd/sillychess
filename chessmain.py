@@ -31,8 +31,8 @@ class MainWindow(QWidget):
                 print("The game ended in a stalemate.")
             else:
                 print(f"Game over: {outcome.termination}")
-
         return outcome
+
     def print_fen(self):
         self.fen = self.chessboard.fen()
         print(f"Current FEN: {self.fen}")
@@ -42,9 +42,11 @@ class MainWindow(QWidget):
         if move_squares:
             for square in move_squares:
                 fill_map[square] = '#003153'
+        dot_map = {square: '#ff0000' for square in range(64)}
         self.chessboardSvg = chess.svg.board(
             self.chessboard,
             fill=fill_map,
+            dot=dot_map,
             size=1080
         ).encode("UTF-8")
         self.widgetSvg.load(self.chessboardSvg)
