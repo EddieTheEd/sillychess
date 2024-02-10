@@ -42,21 +42,20 @@ class MainWindow(QWidget):
         if move_squares:
             for square in move_squares:
                 fill_map[square] = '#003153'
-        dot_map = {square: '#ff0000' for square in range(64)}
         self.chessboardSvg = chess.svg.board(
             self.chessboard,
             fill=fill_map,
-            dot=dot_map,
-            size=1080
+            size=1100,
+            coordinates=False
         ).encode("UTF-8")
         self.widgetSvg.load(self.chessboardSvg)
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            square_size =  1080 //  8
+            square_size =  1100 //  8
             local_pos = event.pos() - self.widgetSvg.geometry().topLeft()
             x_offset =  0
-            y_offset =  30
+            y_offset =  0
             file = ((local_pos.x() + x_offset) // square_size)
             rank =  7 - ((local_pos.y() + y_offset) // square_size)
             square = rank *  8 + file
