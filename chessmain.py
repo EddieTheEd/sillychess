@@ -1,5 +1,7 @@
 import chess
 import chess.svg
+import datetime
+from chess.pgn import Game
 from PyQt5.QtSvg import QSvgWidget
 from PyQt5.QtWidgets import QApplication, QWidget, QLineEdit, QVBoxLayout
 from PyQt5.QtCore import Qt, QPoint
@@ -8,6 +10,15 @@ class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
         self.setGeometry(100,   100,   1100,   1100)
+
+        self.firstmove = True
+
+        self.game = Game()
+        self.game.headers["Event"] = "Custom Event"
+        self.game.headers["White"] = "Player  1"
+        self.game.headers["Black"] = "Player  2"
+        self.game.headers["Date"] = datetime.datetime.now().isoformat()
+        self.game.headers["Result"] = "*"
         
         layout = QVBoxLayout(self)
         self.widgetSvg = QSvgWidget(parent=self)
@@ -33,6 +44,8 @@ class MainWindow(QWidget):
                 print("The game ended in a stalemate.")
             else:
                 print(f"Game over: {outcome.termination}")
+            self.game.headers["Result"] = str(self.chessboard.result())
+            print(str(self.game))
         return outcome
 
     def print_fen(self):
@@ -69,7 +82,14 @@ class MainWindow(QWidget):
                     move.promotion = chess.QUEEN  # Promote to queen
                 if move in self.chessboard.legal_moves:
                     self.chessboard.push(move)
+                    
+                    # we send this move!
                     #self.print_fen()
+                    if self.firstmove:
+                        self.node = self.game.add_variation(move)
+                        self.firstmove = False
+                    else:
+                        self.node = self.node.add_variation(move)
                     window.outcome_check()
                     self.update_board()
                     self.selected_piece = None
